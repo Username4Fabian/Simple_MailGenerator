@@ -1,8 +1,14 @@
 import pandas as pd
 import openpyxl
+import os
 
 # Email presets
 email_formats = ["{f}.{l}@example.com", "{f}{l}@example.com", "{f}_{l}@example.com"]
+
+if(os.path.exists("emails.xlsx") == False):
+    filename = 'emails.xlsx'
+    workbook = openpyxl.Workbook()
+    workbook.save(filename)
 
 # Function to generate email addresses
 def generate_emails(first_name, last_name):
