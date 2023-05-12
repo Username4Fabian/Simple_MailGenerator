@@ -2,8 +2,25 @@ import pandas as pd
 import openpyxl
 import os
 
+
+
+#To do:
+# Make only first or last name valid (done)
+# Expand email formats (done)
+
+# get mail formats from json file
+# validate Emails (might be possible)
+# Allow user to choose email format (json)
+
+# UI 
+
+
 # Email presets
-email_formats = ["{f}.{l}@example.com", "{f}{l}@example.com", "{f}_{l}@example.com"]
+email_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@aon.at", "@gmx.at", "@outlook.com", "@live.com", "@icloud.com"]
+email_formats = []
+
+for x in email_domains:
+    email_formats += ["{f}.{l}"+x, "{f}{l}"+x, "{f}_{l}"+x, "{f[0]}.{l}"+x, "{f}.{l[0]}"+x,]
 
 if(os.path.exists("emails.xlsx") == False):
     filename = 'emails.xlsx'
@@ -25,10 +42,17 @@ def get_names():
 
     while True:
         print("Enter a name (or 'done' to finish):")
-        full_name = input("Full name: ").strip()
+        full_name = input("Full name: ").strip().lower()
         if full_name.lower() == 'done':
             break
-        first_name, last_name = full_name.split(maxsplit=1)
+
+        name_parts = full_name.split(" ")
+        if len(name_parts) == 2:
+            first_name, last_name = name_parts
+        else:
+            first_name = name_parts[0]
+            last_name = ""
+
         names.append((first_name, last_name))
         
         # Load the workbook
@@ -55,6 +79,7 @@ def get_names():
         workbook.save('emails.xlsx')
 
     return names
+
 
 # Get names from user
 names = get_names()
