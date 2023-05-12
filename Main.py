@@ -8,18 +8,20 @@ from PyQt5.QtCore import Qt
 #To do:
 # Make only first or last name valid (done)
 # Expand email formats (done)
+# UI (done)
 
 # get mail formats from json file
 # validate Emails (might be possible)
-# Allow user to choose email format (json)
-
-# UI 
 
 # Timing: 
 # 11.05.2023 20:30 - 01:00
 # 12.05.2023 during day (2h)
 # 12.05.2023 22:00 - 
 
+if(os.path.exists("emails.xlsx") == False):
+    filename = 'emails.xlsx'
+    workbook = openpyxl.Workbook()
+    workbook.save(filename)
 
 # Email presets
 email_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@aon.at", "@gmx.at", "@outlook.com", "@live.com", "@icloud.com"]
@@ -28,10 +30,6 @@ email_formats = []
 for x in email_domains:
     email_formats += ["{f}.{l}"+x, "{f}{l}"+x, "{f}_{l}"+x, "{f[0]}.{l}"+x, "{f}.{l[0]}"+x,]
 
-if(os.path.exists("emails.xlsx") == False):
-    filename = 'emails.xlsx'
-    workbook = openpyxl.Workbook()
-    workbook.save(filename)
 
 # Email presets for first name only
 first_name_email_formats = ["{f}"+x for x in email_domains]
@@ -94,6 +92,20 @@ def get_names():
     name_entry.clear() # clear the input field
     QMessageBox.information(None, "Success", f"Emails for {full_name} have been generated")
 
+# New function to open the Excel file
+def open_excel():
+    filename = 'emails.xlsx'
+    if os.path.isfile(filename):
+        if os.name == 'nt':
+            os.system('start excel.exe "%s"' % filename)
+        elif os.name == 'posix':
+            os.system('open "%s"' % filename)
+        else:
+            QMessageBox.critical(None, "Error", "OS not supported")
+    else:
+        QMessageBox.critical(None, "Error", "File not found")
+
+
 # GUI setup
 app = QApplication([])
 window = QWidget()
@@ -125,12 +137,18 @@ generate_button.setStyleSheet("background-color: #7289DA; color: white")  # Disc
 generate_button.clicked.connect(get_names)
 name_entry.returnPressed.connect(get_names)
 
+# New button to open the Excel file
+open_button = QPushButton("Open Excel File")
+open_button.setStyleSheet("background-color: #7289DA; color: white")  # Discord-like button color
+open_button.clicked.connect(open_excel)
+
 # Place the widgets in the middle of the grid
 layout.addWidget(header_label, 0, 0)
 layout.addWidget(name_label, 1, 0)
 layout.addWidget(name_entry, 2, 0)
 layout.addWidget(generate_button, 3, 0)
-layout.setVerticalSpacing(20)  # Add some vertical spacing between the widgets
+layout.addWidget(open_button, 4, 0)  # Add the new button to the grid layout
+layout.setVerticalSpacing(20)  
 
 # Add the grid layout to the outer layout
 outer_layout.addStretch()
