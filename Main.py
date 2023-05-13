@@ -16,7 +16,7 @@ from PyQt5.QtCore import Qt
 # Timing: 
 # 11.05.2023 20:30 - 01:00
 # 12.05.2023 during day (2h)
-# 12.05.2023 22:00 - 
+# 12.05.2023 22:00 - 00:00
 
 if(os.path.exists("emails.xlsx") == False):
     filename = 'emails.xlsx'
@@ -54,7 +54,7 @@ def get_names():
 
     full_name = name_entry.text().strip().lower()
     if full_name == '':
-        QMessageBox.critical(None, "Error", "Please enter a name")
+        QMessageBox.critical(window, "Error", "Please enter a name")
         return
 
     name_parts = full_name.split(" ")
@@ -90,7 +90,7 @@ def get_names():
     workbook.save('emails.xlsx')
 
     name_entry.clear() # clear the input field
-    QMessageBox.information(None, "Success", f"Emails for {full_name} have been generated")
+    QMessageBox.information(window, "Success", f"Emails for {full_name} have been generated")
 
 # New function to open the Excel file
 def open_excel():
@@ -101,9 +101,9 @@ def open_excel():
         elif os.name == 'posix':
             os.system('open "%s"' % filename)
         else:
-            QMessageBox.critical(None, "Error", "OS not supported")
+            QMessageBox.critical(window, "Error", "OS not supported")
     else:
-        QMessageBox.critical(None, "Error", "File not found")
+        QMessageBox.critical(window, "Error", "File not found")
 
 
 # GUI setup
