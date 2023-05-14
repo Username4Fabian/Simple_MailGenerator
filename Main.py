@@ -1,5 +1,7 @@
 #!/usr/bin/env python3s
 
+# python -m PyInstaller main.spec
+
 import pandas as pd
 import openpyxl
 import os
