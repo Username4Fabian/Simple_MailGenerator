@@ -6,13 +6,14 @@ import os
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLineEdit, QLabel, QMessageBox, QGridLayout, QSizePolicy
 from PyQt5.QtGui import QPalette, QColor, QFont
 from PyQt5.QtCore import Qt
+import json
 
 #To do:
 # Make only first or last name valid (done)
 # Expand email formats (done)
 # UI (done)
+# get mail formats from json file (done)
 
-# get mail formats from json file
 # validate Emails (might be possible)
 
 # Timing: 
@@ -22,6 +23,31 @@ from PyQt5.QtCore import Qt
 
 
 def main():
+    # Read or create email settings
+    if os.path.exists("email_settings.txt"):
+        with open("email_settings.txt", "r") as f:
+            email_settings = json.load(f)
+            email_domains = email_settings['email_domains']
+            email_format_structures = email_settings['email_format_structures']
+
+        # generate email_formats
+        email_formats = []
+        for x in email_domains:
+            email_formats += [format + x for format in email_format_structures]
+    else:
+        # If no settings file found, use these default values and write them to a new file
+        email_domains =  ["@gmail.com", "@aon.at", "@gmx.at", "@gmx.net", "@outlook.com", "@icloud.com"]
+        email_format_structures = ["{f}.{l}", "{f}{l}", "{f}_{l}", "{f[0]}.{l}", "{f}.{l[0]}", "{l}{f}"]
+
+        # generate email_formats
+        email_formats = []
+        for x in email_domains:
+            email_formats += [format + x for format in email_format_structures]
+
+        email_settings = {'email_domains': email_domains, 'email_format_structures': email_format_structures}
+
+        with open("email_settings.txt", "w") as f:
+            json.dump(email_settings, f)
 
     if(os.path.exists("emails.xlsx") == False):
         filename = 'emails.xlsx'
@@ -29,14 +55,7 @@ def main():
         workbook.save(filename)
 
 
-    # Email presets
-    email_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@aon.at", "@gmx.at", "@outlook.com", "@live.com", "@icloud.com"]
-    email_formats = []
-
-    for x in email_domains:
-        email_formats += ["{f}.{l}"+x, "{f}{l}"+x, "{f}_{l}"+x, "{f[0]}.{l}"+x, "{f}.{l[0]}"+x, "{l}{f}"+x,]
-
-
+ 
     # Email presets for first name only
     first_name_email_formats = ["{f}"+x for x in email_domains]
 
@@ -175,4 +194,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
