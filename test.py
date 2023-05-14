@@ -22,3 +22,4 @@ def is_valid_email(email):
 # Usage
 testEmail = "example@stackabuse.com"
 is_valid_email(testEmail)
+print("test")
