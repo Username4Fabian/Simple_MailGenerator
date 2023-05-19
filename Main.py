@@ -22,7 +22,8 @@ import json
 # 11.05.2023 20:30 - 01:00
 # 12.05.2023 during day (2h)
 # 12.05.2023 22:00 - 00:00
-
+# 15.05.2023 20:00 - 22:00
+# 19.05.2023 20:00 - 
 
 def main():
     # Read or create email settings
