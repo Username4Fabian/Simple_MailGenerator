@@ -1,40 +1,24 @@
-import smtplib
-import socket
+import pandas as pd
+import requests
+import json
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 
-def validate_email(email_address, mail_server):
-    try:
-        # Create a socket with a timeout
-        server = smtplib.SMTP(mail_server, timeout=10)
+def verify_email():
+    df = pd.read_excel('emails.xlsx', header=None)
+    
+    # Initialize a new Workbook
+    wb = Workbook()
+    ws = wb.active
 
-        # Use the ehlo or helo command to identify yourself to the SMTP server.
-        server.ehlo_or_helo_if_needed()
+    for email in df[0]:
+        url = f"http://apilayer.net/api/check?access_key=a36f245f96a6&email={email}"
+        response = requests.get(url)
+        data = json.loads(response.text)
 
-        # Request the server for the responses to the RCPT TO command
-        response = server.verify(email_address)
+        # If the smtp_check is true, write the email to the Excel file
+        if data.get('smtp_check', False):
+            ws.append([email])
+            wb.save('valid_emails.xlsx')  # Save the changes after each valid email
 
-        # Close the connection to the server
-        server.quit()
-
-        # The response[0] contains a response code. 
-        # A 250 response code means the request was successful
-        # A 550 response code means the user does not exist
-        if response[0] == 250:
-            print(f"{email_address} exists.")
-            return True
-        elif response[0] == 550:
-            print(f"{email_address} does not exist.")
-            return False
-        else:
-            print(f"Received {response[0]} response.")
-            return False
-    except (smtplib.SMTPConnectError, socket.timeout) as e:
-        print(f"Error: {e}")
-        return False
-
-def check_email(email_address):
-    # Split the email address at '@' and get the domain
-    domain = email_address.split('@')[1]
-    return validate_email(email_address, domain)
-
-# test the code with an example email
-check_email("user0.user0.user0@gmail.com")
+verify_email()
