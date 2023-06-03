@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLi
 from PyQt5.QtGui import QPalette, QColor, QFont
 from PyQt5.QtCore import Qt
 import json
+import requests
 
 #To do:
 # Make only first or last name valid (done)
@@ -68,12 +69,31 @@ def main():
         if last_name:
             for email_format in email_formats:
                 email = email_format.format(f=first_name, l=last_name)
-                emails.append(email)
+                if validate_email(email):  # Add this check before appending
+                    emails.append(email)
+                    
         else:
             for email_format in first_name_email_formats:
                 email = email_format.format(f=first_name)
-                emails.append(email)
+                if validate_email(email):  # Add this check before appending
+                    emails.append(email)
         return emails
+
+    # Add a new function to validate emails
+    def validate_email(email):
+        print(f"Validating email {email}...")
+        api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
+       
+        api_url = "null" # replace with your actual API URL
+        response = requests.get(api_url)
+        data = response.json()
+        if response.status_code == 200 and data.get('smtpCheck') == 'true':
+            print("valid email")
+            return True
+        else:
+            print("NOT valid email")
+            return False
+
 
     # Function to get names from user
     def get_names():

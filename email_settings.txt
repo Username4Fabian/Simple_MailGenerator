@@ -1,0 +1,1 @@
+{"email_domains": ["@gmail.com", "@aon.at", "@gmx.at", "@gmx.net", "@outlook.com", "@icloud.com"], "email_format_structures": ["{f}.{l}"]}
