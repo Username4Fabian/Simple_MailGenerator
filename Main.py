@@ -22,6 +22,8 @@ def main():
             email_settings = json.load(f)
             email_domains = email_settings['email_domains']
             email_format_structures = email_settings['email_format_structures']
+            api_key = email_settings['api_key']  # add this line
+
 
         # generate email_formats
         email_formats = []
@@ -31,13 +33,15 @@ def main():
         # If no settings file found, use these default values and write them to a new file
         email_domains =  ["@gmail.com", "@aon.at", "@gmx.at", "@gmx.net", "@outlook.com", "@icloud.com"]
         email_format_structures = ["{f}.{l}", "{f}{l}", "{f}_{l}", "{f[0]}.{l}", "{f}.{l[0]}", "{l}{f}"]
+        api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5" #API Key for email verification
+
 
         # generate email_formats
         email_formats = []
         for x in email_domains:
             email_formats += [format + x for format in email_format_structures]
 
-        email_settings = {'email_domains': email_domains, 'email_format_structures': email_format_structures}
+        email_settings = {'email_domains': email_domains, 'email_format_structures': email_format_structures, 'api_key': api_key}
 
         with open("email_settings.txt", "w") as f:
             json.dump(email_settings, f)
@@ -47,8 +51,6 @@ def main():
         workbook = openpyxl.Workbook()
         workbook.save(filename)
 
-
- 
     # Email presets for first name only
     first_name_email_formats = ["{f}"+x for x in email_domains]
 
@@ -69,11 +71,9 @@ def main():
         return emails
     
     # Add a new function to validate emails
-
     def validate_email(email):
         def fetch_url():
             print(f"Validating email {email}...")
-            api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
             api_url = f"https://emailverification.whoisxmlapi.com/api/v2?apiKey={api_key}&emailAddress={email}"
             return requests.get(api_url, timeout=3)  # timeout after 3 seconds
 
@@ -95,9 +95,6 @@ def main():
             except requests.exceptions.RequestException as e:
                 print(f"Error occurred: {e}")
                 return False
-
-
-
     # Function to get names from user
     def get_names():
         names = []
