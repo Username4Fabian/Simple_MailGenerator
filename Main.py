@@ -51,6 +51,7 @@ def main():
         workbook = openpyxl.Workbook()
         workbook.save(filename)
 
+
     # Email presets for first name only
     first_name_email_formats = ["{f}"+x for x in email_domains]
 
