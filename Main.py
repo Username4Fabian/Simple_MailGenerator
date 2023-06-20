@@ -10,21 +10,8 @@ from PyQt5.QtGui import QPalette, QColor, QFont
 from PyQt5.QtCore import Qt
 import json
 import requests
-
-#To do:
-# Make only first or last name valid (done)
-# Expand email formats (done)
-# UI (done)
-# get mail formats from json file (done)
-
-# validate Emails (might be possible)
-
-# Timing: 
-# 11.05.2023 20:30 - 01:00
-# 12.05.2023 during day (2h)
-# 12.05.2023 22:00 - 00:00
-# 15.05.2023 20:00 - 22:00
-# 19.05.2023 20:00 - 
+import concurrent.futures
+import requests
 
 def main():
     # Read or create email settings
@@ -78,19 +65,33 @@ def main():
                 if validate_email(email):  # Add this check before appending
                     emails.append(email)
         return emails
-
+    
+    validCounter = 0 # Counter for valid emails
     # Add a new function to validate emails
+
     def validate_email(email):
-        print(f"Validating email {email}...")
-        api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
-       
-        api_url = "null" # replace with your actual API URL
-        response = requests.get(api_url)
-        data = response.json()
-        if response.status_code == 200 and data.get('smtpCheck') == 'true':
-            print("valid email")
-            return True
-        else:
+        def fetch_url():
+            print(f"Validating email {email}...")
+            api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
+            api_url = f"https://emailverification.whoisxmlapi.com/api/v2?apiKey={api_key}&emailAddress={email}"
+            return requests.get(api_url)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(fetch_url)
+            try:
+                response = future.result(timeout=3)  # timeout after 3 seconds
+                data = response.json()
+                if response.status_code == 200 and data.get('smtpCheck') == 'true':
+                    print("valid email")
+                    validCounter += 1
+                    return True
+            except concurrent.futures.TimeoutError:
+                print("Timeout, NOT valid email")
+                return False
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                return False
+
             print("NOT valid email")
             return False
 
@@ -137,8 +138,10 @@ def main():
         # Save the workbook
         workbook.save('emails.xlsx')
 
+
         name_entry.clear() # clear the input field
         QMessageBox.information(window, "Success", f"Emails for {full_name} have been generated")
+        validCounter = 0 # Reset the valid email counter
 
     # New function to open the Excel file
     def open_excel():

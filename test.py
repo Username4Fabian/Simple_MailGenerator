@@ -5,7 +5,7 @@ from openpyxl import Workbook
 def validate_email(email):
     print(f"Validating email {email}...")
     api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
-    api_url = "null" # replace with your actual API URL
+    api_url = f"https://emailverification.whoisxmlapi.com/api/v2?apiKey={api_key}&emailAddress={email}"
 
     try:
         response = requests.get(api_url)
