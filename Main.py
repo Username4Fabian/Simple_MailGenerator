@@ -12,6 +12,8 @@ import json
 import requests
 import concurrent.futures
 import requests
+import requests
+import concurrent.futures
 
 def main():
     # Read or create email settings
@@ -66,7 +68,6 @@ def main():
                     emails.append(email)
         return emails
     
-    validCounter = 0 # Counter for valid emails
     # Add a new function to validate emails
 
     def validate_email(email):
@@ -74,26 +75,27 @@ def main():
             print(f"Validating email {email}...")
             api_key = "at_sm3Xy5aowsOCoyDHv5oz2gVcjBNL5"  # replace with your actual API key
             api_url = f"https://emailverification.whoisxmlapi.com/api/v2?apiKey={api_key}&emailAddress={email}"
-            return requests.get(api_url)
+            return requests.get(api_url, timeout=3)  # timeout after 3 seconds
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(fetch_url)
             try:
-                response = future.result(timeout=3)  # timeout after 3 seconds
+                response = future.result()
+                response.raise_for_status()  # raise an exception for non-200 status codes
                 data = response.json()
-                if response.status_code == 200 and data.get('smtpCheck') == 'true':
-                    print("valid email")
-                    validCounter += 1
+                if data.get('smtpCheck') == 'true':
+                    print("Valid email")
                     return True
-            except concurrent.futures.TimeoutError:
-                print("Timeout, NOT valid email")
+                else:
+                    print("Invalid email")
+                    return False
+            except requests.exceptions.Timeout:
+                print("Timeout, not a valid email")
                 return False
-            except Exception as e:
+            except requests.exceptions.RequestException as e:
                 print(f"Error occurred: {e}")
                 return False
 
-            print("NOT valid email")
-            return False
 
 
     # Function to get names from user
@@ -141,7 +143,6 @@ def main():
 
         name_entry.clear() # clear the input field
         QMessageBox.information(window, "Success", f"Emails for {full_name} have been generated")
-        validCounter = 0 # Reset the valid email counter
 
     # New function to open the Excel file
     def open_excel():
